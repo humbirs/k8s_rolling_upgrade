@@ -1,0 +1,10 @@
+---
+- hosts:
+    - kubernetes-master-nodes
+    - kubernetes-worker-nodes
+  become: true
+  become_method: sudo
+  serial: 1
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  roles:
+    - { role: roles/application/k8s_rolling_upgrade }

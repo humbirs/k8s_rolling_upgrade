@@ -1,0 +1,47 @@
+---
+- name: Get the node's details
+  command: >-
+    {{ bin_dir }}/kubectl get node
+    {{ kube_override_hostname|default(inventory_hostname) }}
+    -o json
+  register: kubectl_get_node
+  delegate_to: "{{ groups['kubernetes-master-nodes'][0] }}"
+  failed_when: false
+  changed_when: false
+
+- name: Print return information kubectl_get_node
+  ansible.builtin.debug:
+    var: kubectl_get_node
+
+
+- name: Set kubernetes.repo Config
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+
+- name: Configuring CRI-O Repo
+  template:
+    src: templates/crio.repo.j2
+    dest: /etc/yum.repos.d/crio.repo
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+    backup: yes
+
+- include_tasks: drain.yml
+
+- name: Update Primary Master
+  when:
+    - groups['kubernetes-master-nodes'][0] == inventory_hostname
+  include_tasks: upgrade_primary_master.yml
+
+- name: Update remaining nodes
+  when:
+    - groups['kubernetes-master-nodes'][0] != inventory_hostname
+  include_tasks: upgrade_nodes.yml
+
+- include_tasks: uncordon.yml

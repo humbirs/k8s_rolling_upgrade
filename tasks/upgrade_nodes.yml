@@ -1,0 +1,52 @@
+---
+
+- name: Update Other control plane also worker nodes
+  when:
+    - groups['kubernetes-master-nodes'][0] != inventory_hostname
+  block:
+    - name: Install these packages - kubelet kubeadm kubectl
+      yum:
+        name: "{{ rpm_list }}"
+        state: present
+        disable_excludes: kubernetes
+      vars:
+        rpm_list:
+          - kubeadm-{{ VERSION }}.{{ MINOR_VERSION }}-0
+      become: yes
+
+    - name: Kubeadm upgrade node
+      command: >-
+        {{ bin_dir }}/kubeadm upgrade node --certificate-renewal=false
+      register: kubeadm_upgrade_node
+      changed_when: false
+    
+    - name: Print return information from the previous task kubeadm_upgrade_plan
+      ansible.builtin.debug:
+        var: kubeadm_upgrade_node
+
+    - name: Install these packages - kubelet kubectl
+      yum:
+        name: "{{ rpm_list }}"
+        state: present
+        disable_excludes: kubernetes
+      vars:
+        rpm_list:
+          - kubelet-{{ VERSION }}.{{ MINOR_VERSION }}-0
+          - kubectl-{{ VERSION }}.{{ MINOR_VERSION }}-0
+          - cri-o
+      become: yes
+    - name: restart service crio with demon_reload
+      systemd:
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+        name: crio
+
+    - name: restart service kubelet with demon_reload
+      systemd:
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+        name: kubelet
+
+
