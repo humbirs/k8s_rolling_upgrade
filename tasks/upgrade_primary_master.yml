@@ -26,7 +26,7 @@
 
     - name: Kubeadm upgrade apply 
       command: >-
-        {{ bin_dir }}/kubeadm upgrade apply v1.22.11 --certificate-renewal=false --yes
+        {{ bin_dir }}/kubeadm upgrade apply v{{ VERSION }}.{{ MINOR_VERSION }} --certificate-renewal=false --yes
       register: kubeadm_upgrade_plan
       changed_when: false
     - name: Install these packages - kubelet kubectl
