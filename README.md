@@ -24,7 +24,7 @@ See playbook/k8s_upgrade.yml and playbook/hosts.example
 License
 -------
 
-GPU 2
+GNU General Public License v2.0
 
 Author Information
 ------------------
