@@ -1,0 +1,13 @@
+[kubernetescluster:children]
+kubernetes-worker-nodes
+kubernetes-master-nodes
+
+[kubernetes-master-nodes]
+master01 nodetype=master
+master02 nodetype=master
+master03 nodetype=master
+
+[kubernetes-worker-nodes]
+worker01 nodetype=worker
+worker02 nodetype=worker
+worker03 nodetype=worker
