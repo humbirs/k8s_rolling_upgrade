@@ -14,3 +14,5 @@ ansible_port: 22
 ansible_become: yes
 ansible_become_method: sudo
 ansible_python_interpreter: /usr/bin/python3
+VERSION=1.22
+MINOR_VERSION=11
